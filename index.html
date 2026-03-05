@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quchan</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#fff; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#000; }
+a { color:#34345c; text-decoration:none; cursor:pointer; }
+a:hover { color:#dd0000; text-decoration:underline; }
+.page { display:none; } .page.active { display:block; }
+hr { border:none; border-top:1px solid #d6d6d6; margin:8px 0; }
+
+/* HEADER */
+#header { background:#fff; border-bottom:1px solid #b7c5d9; }
+#header-top { display:flex; align-items:center; justify-content:space-between; padding:6px 14px 4px; }
+#hl,#hr2 { font-size:11px; color:#666; }
+#hl a,#hr2 a { color:#34345c; font-size:11px; }
+#hc { display:flex; flex-direction:column; align-items:center; }
+#site-title { font-size:28px; font-weight:bold; color:#800000; letter-spacing:2px; line-height:1; }
+#site-sub { font-size:11px; color:#666; margin-top:2px; }
+#hnav { background:#efefef; border-top:1px solid #d9d9d9; padding:3px 0; text-align:center; font-size:11px; }
+#hnav a { color:#34345c; margin:0 5px; font-size:11px; }
+#hnav a:hover { color:#dd0000; }
+#hnav .sp { color:#aaa; }
+
+/* HOME */
+#home-inner { max-width:1100px; margin:0 auto; padding:10px 14px 24px; }
+.notice { background:#ffffcc; border:1px solid #e0d800; padding:5px 10px; font-size:12px; margin-bottom:10px; color:#333; line-height:1.6; }
+.cat-title { font-size:13px; font-weight:bold; color:#800000; margin:10px 0 5px; border-bottom:1px solid #ccc; padding-bottom:2px; }
+.bgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:0 16px; margin-bottom:4px; }
+.bi { font-size:12.5px; line-height:1.75; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bi a { color:#34345c; } .bi a:hover { color:#dd0000; }
+.bi .dash { color:#999; margin:0 3px; } .bi a.code { font-weight:bold; }
+#search-row { font-size:12px; margin-bottom:8px; }
+#search-row input[type=text] { border:1px solid #aaa; padding:2px 5px; font-size:12px; width:200px; }
+#search-row input[type=submit] { border:1px solid #aaa; background:#f0f0f0; padding:2px 10px; font-size:12px; cursor:pointer; margin-left:3px; }
+
+/* BOARD WRAP */
+#board-wrap { max-width:1100px; margin:0 auto; padding:10px 14px 30px; }
+.board-top-bar { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:3px; }
+.board-top-bar h2 { font-size:15px; font-weight:bold; color:#800000; }
+.board-top-bar span { font-size:11px; color:#555; }
+.breadcrumb { font-size:11px; color:#555; margin-bottom:8px; }
+.breadcrumb a { color:#34345c; font-size:11px; }
+
+/* LOADING SPINNER */
+.loading { font-size:12px; color:#666; padding:10px 0; font-style:italic; }
+.loading::before { content:'⏳ '; }
+.err-msg { font-size:12px; color:#cc0000; padding:6px 0; }
+
+/* POST FORM */
+.form-box { background:#f0e0d6; border:1px solid #d9bfb7; padding:8px 14px 10px; margin-bottom:14px; }
+.form-box h3 { font-size:13px; color:#800000; margin-bottom:8px; border-bottom:1px solid #d9bfb7; padding-bottom:3px; }
+.frow { display:flex; align-items:flex-start; margin-bottom:5px; gap:6px; }
+.frow label { width:76px; text-align:right; padding-top:3px; font-size:12px; color:#333; flex-shrink:0; }
+.frow input[type=text] { width:220px; border:1px solid #aaa; padding:3px 5px; font-size:12px; background:#fff; font-family:Arial; }
+.frow textarea { width:360px; height:80px; border:1px solid #aaa; padding:3px 5px; font-size:12px; background:#fff; resize:vertical; font-family:Arial; }
+.frow input[type=file] { font-size:11px; }
+.fsub { background:#f0f0f0; border:1px solid #aaa; padding:3px 18px; font-size:12px; cursor:pointer; margin-left:82px; margin-top:4px; font-family:Arial; }
+.fsub:hover { background:#e0e0e0; }
+.fsub:disabled { opacity:.5; cursor:not-allowed; }
+.fmsg { font-size:11px; margin-left:8px; }
+
+/* BOARD INDEX */
+.thread-block { border-bottom:1px solid #d9d9d9; padding:10px 0 8px; }
+.thread-block:last-child { border-bottom:none; }
+.op-post { display:flex; gap:10px; margin-bottom:5px; }
+.op-img { flex-shrink:0; }
+.thumb-ph { width:150px; height:90px; background:#e8e8e8; border:1px solid #bbb; display:flex; align-items:center; justify-content:center; font-size:11px; color:#999; }
+.op-body { flex:1; }
+.post-hdr { font-size:12px; margin-bottom:3px; line-height:1.6; }
+.post-hdr .subj { font-weight:bold; color:#cc1105; margin-right:5px; }
+.post-hdr .name { font-weight:bold; color:#117743; }
+.post-hdr .dt { color:#777; font-size:11px; margin-left:5px; }
+.post-hdr .pno { font-size:11px; margin-left:5px; }
+.post-hdr .pno a { color:#34345c; font-size:11px; }
+.post-hdr .op-lbl { color:#800000; font-size:11px; font-weight:bold; margin-left:4px; }
+.post-hdr .del-btn { font-size:11px; color:#bbb; margin-left:8px; cursor:pointer; }
+.post-hdr .del-btn:hover { color:#cc0000; text-decoration:none; }
+.post-txt { font-size:13px; line-height:1.6; white-space:pre-wrap; word-break:break-word; margin-bottom:4px; }
+.gt { color:#789922; }
+.imgfile { font-size:11px; color:#34345c; margin-bottom:2px; }
+.omitted { font-size:12px; color:#666; margin:4px 0; }
+.omitted a { color:#34345c; font-size:12px; }
+.inline-replies { margin-left:30px; padding-left:10px; border-left:2px solid #d9d9d9; margin-top:4px; }
+.reply-post { margin-bottom:6px; padding-bottom:5px; border-bottom:1px solid #efefef; }
+.reply-post:last-child { border-bottom:none; margin-bottom:0; }
+.thread-actions { font-size:11.5px; margin-top:5px; }
+.thread-actions a { color:#34345c; margin-right:10px; font-size:11.5px; }
+.thread-actions a:hover { color:#dd0000; }
+
+/* THREAD VIEW */
+#thread-wrap { max-width:1100px; margin:0 auto; padding:10px 14px 30px; }
+.tv-hdr { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:3px; }
+.tv-hdr h2 { font-size:15px; font-weight:bold; color:#800000; }
+.tv-bread { font-size:11px; color:#555; margin-bottom:8px; }
+.tv-bread a { color:#34345c; font-size:11px; }
+#thread-posts .reply-post { margin-left:0; padding:6px 0; border-bottom:1px solid #efefef; }
+#thread-posts .reply-post:last-child { border-bottom:none; }
+
+/* FOOTER */
+#footer { border-top:1px solid #b7c5d9; padding:8px 14px; text-align:center; font-size:11px; color:#666; line-height:1.9; }
+#footer a { color:#34345c; font-size:11px; }
+#footer a:hover { color:#dd0000; }
+#footer .sp { color:#bbb; margin:0 3px; }
+
+@media(max-width:700px){
+  .bgrid { grid-template-columns:repeat(2,1fr); }
+  .frow textarea { width:240px; }
+  .frow input[type=text] { width:180px; }
+  .thumb-ph { width:100px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div id="header-top">
+    <div id="hl"><a onclick="goHome()">Boards</a></div>
+    <div id="hc">
+      <div id="site-title">Quchan</div>
+      <div id="site-sub">The Imageboard</div>
+    </div>
+    <div id="hr2"><a href="#">FAQ</a> | <a href="#">Rules</a> | <a href="#">Contact</a></div>
+  </div>
+  <div id="hnav">
+    <a onclick="goHome()">Boards</a><span class="sp">|</span>
+    <a id="hnav-board" style="display:none"></a><span class="sp" id="hnav-sep" style="display:none">|</span>
+    <a href="#">FAQ</a><span class="sp">|</span>
+    <a href="#">Rules</a><span class="sp">|</span>
+    <a href="#">Contact</a>
+  </div>
+</div>
+
+<!-- ══════════ HOME ══════════ -->
+<div id="page-home" class="page active">
+<div id="home-inner">
+  <div class="notice"><b>Welcome to Quchan.</b> Read the <a href="#">Global Rules</a> before posting.</div>
+  <div id="search-row">Search: <input type="text" id="sq" placeholder="Search Quchan..."><input type="submit" value="Submit" onclick="doSearch()"></div>
+  <hr>
+  <div class="cat-title">Japanese Culture</div>
+  <div class="bgrid">
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('a','Anime &amp; Manga')">/a/</a><span class="dash">-</span><a onclick="goBoard('a','Anime &amp; Manga')">Anime &amp; Manga</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('c','Anime/Cute')">/c/</a><span class="dash">-</span><a onclick="goBoard('c','Anime/Cute')">Anime/Cute</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('w','Anime/Wallpapers')">/w/</a><span class="dash">-</span><a onclick="goBoard('w','Anime/Wallpapers')">Anime/Wallpapers</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('m','Mecha')">/m/</a><span class="dash">-</span><a onclick="goBoard('m','Mecha')">Mecha</a></div>
+    </div>
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('jp','Otaku Culture')">/jp/</a><span class="dash">-</span><a onclick="goBoard('jp','Otaku Culture')">Otaku Culture</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('vn','Visual Novels')">/vn/</a><span class="dash">-</span><a onclick="goBoard('vn','Visual Novels')">Visual Novels</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('qa','Question &amp; Answer')">/qa/</a><span class="dash">-</span><a onclick="goBoard('qa','Question &amp; Answer')">Question &amp; Answer</a></div>
+    </div>
+  </div>
+  <hr>
+  <div class="cat-title">Interests</div>
+  <div class="bgrid">
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('v','Video Games')">/v/</a><span class="dash">-</span><a onclick="goBoard('v','Video Games')">Video Games</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('vg','Video Game Generals')">/vg/</a><span class="dash">-</span><a onclick="goBoard('vg','Video Game Generals')">Video Game Generals</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('mu','Music')">/mu/</a><span class="dash">-</span><a onclick="goBoard('mu','Music')">Music</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('sp','Sports')">/sp/</a><span class="dash">-</span><a onclick="goBoard('sp','Sports')">Sports</a></div>
+    </div>
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('lit','Literature')">/lit/</a><span class="dash">-</span><a onclick="goBoard('lit','Literature')">Literature</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('sci','Science &amp; Math')">/sci/</a><span class="dash">-</span><a onclick="goBoard('sci','Science &amp; Math')">Science &amp; Math</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('his','History')">/his/</a><span class="dash">-</span><a onclick="goBoard('his','History')">History &amp; Humanities</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('fit','Fitness')">/fit/</a><span class="dash">-</span><a onclick="goBoard('fit','Fitness')">Fitness</a></div>
+    </div>
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('ck','Food &amp; Cooking')">/ck/</a><span class="dash">-</span><a onclick="goBoard('ck','Food &amp; Cooking')">Food &amp; Cooking</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('trv','Travel')">/trv/</a><span class="dash">-</span><a onclick="goBoard('trv','Travel')">Travel</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('diy','Do It Yourself')">/diy/</a><span class="dash">-</span><a onclick="goBoard('diy','Do It Yourself')">Do It Yourself</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('out','Outdoors')">/out/</a><span class="dash">-</span><a onclick="goBoard('out','Outdoors')">Outdoors</a></div>
+    </div>
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('o','Auto')">/o/</a><span class="dash">-</span><a onclick="goBoard('o','Auto')">Auto</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('k','Weapons')">/k/</a><span class="dash">-</span><a onclick="goBoard('k','Weapons')">Weapons</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('biz','Business &amp; Finance')">/biz/</a><span class="dash">-</span><a onclick="goBoard('biz','Business &amp; Finance')">Business &amp; Finance</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('int','International')">/int/</a><span class="dash">-</span><a onclick="goBoard('int','International')">International</a></div>
+    </div>
+  </div>
+  <hr>
+  <div class="cat-title">Creative</div>
+  <div class="bgrid">
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('i','Oekaki')">/i/</a><span class="dash">-</span><a onclick="goBoard('i','Oekaki')">Oekaki</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('p','Photography')">/p/</a><span class="dash">-</span><a onclick="goBoard('p','Photography')">Photography</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('gd','Graphic Design')">/gd/</a><span class="dash">-</span><a onclick="goBoard('gd','Graphic Design')">Graphic Design</a></div>
+    </div>
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('wg','Wallpapers')">/wg/</a><span class="dash">-</span><a onclick="goBoard('wg','Wallpapers')">Wallpapers/General</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('3','3DCG')">/3/</a><span class="dash">-</span><a onclick="goBoard('3','3DCG')">3DCG</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('ic','Artwork/Critique')">/ic/</a><span class="dash">-</span><a onclick="goBoard('ic','Artwork/Critique')">Artwork/Critique</a></div>
+    </div>
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('wri','Creative Writing')">/wri/</a><span class="dash">-</span><a onclick="goBoard('wri','Creative Writing')">Creative Writing</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('po','Papercraft')">/po/</a><span class="dash">-</span><a onclick="goBoard('po','Papercraft')">Papercraft &amp; Origami</a></div>
+    </div>
+  </div>
+  <hr>
+  <div class="cat-title">Other</div>
+  <div class="bgrid">
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('b','Random')">/b/</a><span class="dash">-</span><a onclick="goBoard('b','Random')">Random</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('pol','Politically Incorrect')">/pol/</a><span class="dash">-</span><a onclick="goBoard('pol','Politically Incorrect')">Politically Incorrect</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('news','Current News')">/news/</a><span class="dash">-</span><a onclick="goBoard('news','Current News')">Current News</a></div>
+    </div>
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('x','Paranormal')">/x/</a><span class="dash">-</span><a onclick="goBoard('x','Paranormal')">Paranormal</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('tv','Television &amp; Film')">/tv/</a><span class="dash">-</span><a onclick="goBoard('tv','Television &amp; Film')">Television &amp; Film</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('g','Technology')">/g/</a><span class="dash">-</span><a onclick="goBoard('g','Technology')">Technology</a></div>
+    </div>
+    <div>
+      <div class="bi"><a class="code" onclick="goBoard('co','Comics &amp; Cartoons')">/co/</a><span class="dash">-</span><a onclick="goBoard('co','Comics &amp; Cartoons')">Comics &amp; Cartoons</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('q','Quchan Feedback')">/q/</a><span class="dash">-</span><a onclick="goBoard('q','Quchan Feedback')">Quchan Feedback</a></div>
+      <div class="bi"><a class="code" onclick="goBoard('wsr','Worksafe Requests')">/wsr/</a><span class="dash">-</span><a onclick="goBoard('wsr','Worksafe Requests')">Worksafe Requests</a></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ BOARD INDEX ══════════ -->
+<div id="page-board" class="page">
+<div id="board-wrap">
+  <div class="board-top-bar">
+    <h2 id="board-title-h"></h2>
+    <span><a onclick="goHome()">[Boards]</a></span>
+  </div>
+  <div class="breadcrumb">
+    [<a onclick="goHome()">Boards</a>]
+    [<span id="bc-board"></span>]
+    [<a onclick="scrollToNewThread()">Start a New Thread</a>]
+  </div>
+
+  <!-- NEW THREAD FORM -->
+  <div class="form-box" id="new-thread-form">
+    <h3>Start a New Thread</h3>
+    <div class="frow"><label>Name</label><input type="text" id="nt-name" placeholder="Anonymous" maxlength="50"></div>
+    <div class="frow"><label>Subject</label><input type="text" id="nt-subject" maxlength="100"></div>
+    <div class="frow"><label>Comment</label><textarea id="nt-comment" placeholder="Write your post...&#10;> greentext starts with >"></textarea></div>
+    <div class="frow"><label>Image</label><input type="file" id="nt-image" accept="image/*"><span style="font-size:11px;color:#888;padding-top:3px;">(filename only)</span></div>
+    <div style="margin-top:6px;">
+      <input type="button" class="fsub" id="nt-btn" value="New Thread" onclick="submitNewThread()">
+      <span class="fmsg" id="nt-msg"></span>
+    </div>
+  </div>
+
+  <!-- BOARD INDEX -->
+  <div id="board-index"></div>
+</div>
+</div>
+
+<!-- ══════════ THREAD VIEW ══════════ -->
+<div id="page-thread" class="page">
+<div id="thread-wrap">
+  <div class="tv-hdr">
+    <h2 id="tv-title"></h2>
+    <span><a onclick="goBoardBack()">[Return]</a> <a onclick="goBoardBack()">[Catalog]</a></span>
+  </div>
+  <div class="tv-bread">
+    [<a onclick="goHome()">Boards</a>]
+    [<a onclick="goBoardBack()" id="tv-bc-board"></a>]
+    [<a onclick="document.getElementById('reply-form-box').scrollIntoView({behavior:'smooth'})">Post a Reply</a>]
+  </div>
+
+  <!-- REPLY FORM -->
+  <div id="reply-form-box" class="form-box">
+    <h3>Post a Reply</h3>
+    <div class="frow"><label>Name</label><input type="text" id="rp-name" placeholder="Anonymous" maxlength="50"></div>
+    <div class="frow"><label>Comment</label><textarea id="rp-comment" placeholder="Write your reply...&#10;> greentext&#10;>>postNo to quote"></textarea></div>
+    <div class="frow"><label>Image</label><input type="file" id="rp-image" accept="image/*"><span style="font-size:11px;color:#888;padding-top:3px;">(filename only)</span></div>
+    <div style="margin-top:6px;">
+      <input type="button" class="fsub" id="rp-btn" value="Post Reply" onclick="submitReply()">
+      <span class="fmsg" id="rp-msg"></span>
+    </div>
+  </div>
+
+  <div id="thread-posts"></div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<div id="footer">
+  <div>
+    <a onclick="goHome()">Boards</a><span class="sp">|</span>
+    <a href="#">FAQ</a><span class="sp">|</span>
+    <a href="#">Rules</a><span class="sp">|</span>
+    <a href="#">Privacy</a><span class="sp">|</span>
+    <a href="#">Contact</a>
+  </div>
+  <div>All posts are the responsibility of the poster. &copy; 2024 Quchan</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// CONFIG — Google Apps Script URL
+// ═══════════════════════════════════════
+const API = 'https://script.google.com/macros/s/AKfycbwn0J_oXXfipzkqCrO3PeMex4j6BC21L22WAY1PB8TbEnXYT-4637iEb5IcW_t-rmqm-Q/exec';
+
+let curBoard = 'b';
+let curBoardName = 'Random';
+let threads = [];
+let curThreadId = null;
+
+// ── HELPERS ──
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtComment(txt){
+  return String(txt).split('\n').map(line=>{
+    const e = esc(line);
+    if(line.startsWith('>')) return '<span class="gt">'+e+'</span>';
+    return e.replace(/&gt;&gt;(\w+)/g,'<a class="pno" onclick="quotePost(\'$1\')">&gt;&gt;$1</a>');
+  }).join('<br>');
+}
+
+function setMsg(id, text, ok){
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.style.color = ok ? '#336633' : '#cc0000';
+}
+
+function setBusy(btnId, busy){
+  const btn = document.getElementById(btnId);
+  btn.disabled = busy;
+  btn.style.opacity = busy ? '0.5' : '1';
+}
+
+// ── NAVIGATION ──
+function showOnly(id){
+  ['page-home','page-board','page-thread'].forEach(p=>{
+    document.getElementById(p).classList.toggle('active', p===id);
+  });
+  window.scrollTo(0,0);
+}
+
+function goHome(){
+  threads=[]; curThreadId=null;
+  document.getElementById('hnav-board').style.display='none';
+  document.getElementById('hnav-sep').style.display='none';
+  showOnly('page-home');
+}
+
+function goBoard(code, name){
+  curBoard = code;
+  curBoardName = name.replace(/&amp;/g,'&');
+  curThreadId = null;
+  threads = [];
+  document.getElementById('board-title-h').textContent = '/'+code+'/ - '+curBoardName;
+  document.getElementById('bc-board').textContent = '/'+code+'/';
+  document.getElementById('nt-name').value='';
+  document.getElementById('nt-subject').value='';
+  document.getElementById('nt-comment').value='';
+  document.getElementById('nt-image').value='';
+  document.getElementById('nt-msg').textContent='';
+  const nb = document.getElementById('hnav-board');
+  nb.textContent='/'+code+'/'; nb.onclick=()=>goBoard(code,name);
+  nb.style.display=''; document.getElementById('hnav-sep').style.display='';
+  showOnly('page-board');
+  loadBoard();
+}
+
+function goBoardBack(){
+  curThreadId=null;
+  showOnly('page-board');
+  loadBoard();
+}
+
+function scrollToNewThread(){
+  document.getElementById('new-thread-form').scrollIntoView({behavior:'smooth'});
+}
+
+function doSearch(){
+  const q=document.getElementById('sq').value.trim();
+  if(q) alert('Search: "'+q+'" — coming soon!');
+}
+document.getElementById('sq').addEventListener('keydown',e=>{ if(e.key==='Enter') doSearch(); });
+
+// ── QUOTE POST ──
+function quotePost(id){
+  const ta = document.getElementById('rp-comment');
+  if(!ta) return;
+  const q = '>>'+id+'\n';
+  ta.value = ta.value ? ta.value+'\n'+q : q;
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+  document.getElementById('reply-form-box').scrollIntoView({behavior:'smooth'});
+}
+
+// ── API CALLS ──
+async function apiGet(board){
+  const res = await fetch(API+'?action=get&board='+encodeURIComponent(board));
+  return res.json();
+}
+
+async function apiPost(data){
+  const res = await fetch(API, {
+    method:'POST',
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+// ── LOAD BOARD ──
+async function loadBoard(){
+  const el = document.getElementById('board-index');
+  el.innerHTML = '<div class="loading">Loading '+curBoard+'...</div>';
+  try {
+    const data = await apiGet(curBoard);
+    threads = data.threads || [];
+    renderIndex();
+  } catch(e) {
+    el.innerHTML = '<div class="err-msg">Failed to load board. Check your connection and try again.</div>';
+  }
+}
+
+// ── LOAD THREAD ──
+async function loadThread(tid){
+  const el = document.getElementById('thread-posts');
+  el.innerHTML = '<div class="loading">Loading thread...</div>';
+  try {
+    const data = await apiGet(curBoard);
+    threads = data.threads || [];
+    const t = threads.find(t=>t.id===tid);
+    if(!t){ el.innerHTML='<div class="err-msg">Thread not found.</div>'; return; }
+    renderThread();
+  } catch(e){
+    el.innerHTML = '<div class="err-msg">Failed to load thread.</div>';
+  }
+}
+
+// ── OPEN THREAD ──
+function openThread(tid){
+  curThreadId = tid;
+  const t = threads.find(t=>t.id===tid);
+  const subj = t ? (t.posts[0].subject || 'Thread') : 'Thread';
+  document.getElementById('tv-title').textContent = '/'+curBoard+'/ - '+subj;
+  document.getElementById('tv-bc-board').textContent = '/'+curBoard+'/';
+  document.getElementById('rp-name').value='';
+  document.getElementById('rp-comment').value='';
+  document.getElementById('rp-image').value='';
+  document.getElementById('rp-msg').textContent='';
+  showOnly('page-thread');
+  loadThread(tid);
+}
+
+// ── SUBMIT NEW THREAD ──
+async function submitNewThread(){
+  const comment = document.getElementById('nt-comment').value.trim();
+  if(!comment){ setMsg('nt-msg','Comment is required.',false); return; }
+  const name    = document.getElementById('nt-name').value.trim()||'Anonymous';
+  const subject = document.getElementById('nt-subject').value.trim();
+  const imgEl   = document.getElementById('nt-image');
+  const image   = (imgEl.files&&imgEl.files[0]) ? imgEl.files[0].name : '';
+
+  setBusy('nt-btn',true);
+  setMsg('nt-msg','Posting...',true);
+  try {
+    const res = await apiPost({ action:'newThread', board:curBoard, name, subject, comment, image });
+    if(res.ok){
+      document.getElementById('nt-comment').value='';
+      document.getElementById('nt-subject').value='';
+      document.getElementById('nt-name').value='';
+      document.getElementById('nt-image').value='';
+      setMsg('nt-msg','Thread posted!',true);
+      await loadBoard();
+    } else {
+      setMsg('nt-msg','Error: '+(res.error||'unknown'),false);
+    }
+  } catch(e){
+    setMsg('nt-msg','Network error. Try again.',false);
+  }
+  setBusy('nt-btn',false);
+}
+
+// ── SUBMIT REPLY ──
+async function submitReply(){
+  const comment = document.getElementById('rp-comment').value.trim();
+  if(!comment){ setMsg('rp-msg','Comment is required.',false); return; }
+  const name  = document.getElementById('rp-name').value.trim()||'Anonymous';
+  const imgEl = document.getElementById('rp-image');
+  const image = (imgEl.files&&imgEl.files[0]) ? imgEl.files[0].name : '';
+
+  setBusy('rp-btn',true);
+  setMsg('rp-msg','Posting...',true);
+  try {
+    const res = await apiPost({ action:'reply', board:curBoard, tid:curThreadId, name, comment, image });
+    if(res.ok){
+      document.getElementById('rp-comment').value='';
+      document.getElementById('rp-name').value='';
+      document.getElementById('rp-image').value='';
+      setMsg('rp-msg','Reply posted!',true);
+      await loadThread(curThreadId);
+    } else {
+      setMsg('rp-msg','Error: '+(res.error||'unknown'),false);
+    }
+  } catch(e){
+    setMsg('rp-msg','Network error. Try again.',false);
+  }
+  setBusy('rp-btn',false);
+}
+
+// ── DELETE ──
+async function deletePost(tid, pid, isOP){
+  const msg = isOP ? 'Delete this entire thread and all replies?' : 'Delete this reply?';
+  if(!confirm(msg)) return;
+  try {
+    const res = await apiPost({ action:'deletePost', board:curBoard, tid, pid, isOP });
+    if(res.ok){
+      if(isOP){
+        await loadBoard();
+        showOnly('page-board');
+      } else {
+        await loadThread(curThreadId);
+      }
+    }
+  } catch(e){ alert('Delete failed. Try again.'); }
+}
+
+// ── POST HEADER HTML ──
+function postHdr(p, tid, isOP){
+  let h = '<div class="post-hdr">';
+  if(p.subject) h += '<span class="subj">'+esc(p.subject)+'</span>';
+  h += '<span class="name">'+esc(p.name)+'</span>';
+  h += '<span class="dt">'+esc(p.date)+'</span>';
+  h += ' <span class="pno">No.<a onclick="quotePost(\''+esc(p.id)+'\')">'+esc(p.id)+'</a></span>';
+  if(isOP) h += '<span class="op-lbl"> (OP)</span>';
+  h += '<a class="del-btn" onclick="deletePost(\''+esc(tid)+'\',\''+esc(p.id)+'\','+isOP+')" title="Delete">[X]</a>';
+  h += '</div>';
+  return h;
+}
+
+function postImgHTML(p){
+  if(!p.image) return '';
+  return '<div class="op-img"><div class="imgfile">File: '+esc(p.image)+'</div>'
+        +'<div class="thumb-ph">[image]</div></div>';
+}
+
+// ── RENDER BOARD INDEX ──
+function renderIndex(){
+  const el = document.getElementById('board-index');
+  if(!threads.length){
+    el.innerHTML='<div style="font-size:12.5px;color:#888;font-style:italic;margin:16px 0;">No threads yet. Be the first to post!</div>';
+    return;
+  }
+  let h='';
+  threads.forEach(t=>{
+    const op = t.posts[0];
+    const replies = t.posts.slice(1);
+    const shown = replies.slice(-3);
+    const omitted = replies.length - shown.length;
+    h += '<div class="thread-block" id="tb-'+esc(t.id)+'">';
+    h += '<div class="op-post">';
+    h += postImgHTML(op);
+    h += '<div class="op-body">';
+    h += postHdr(op, t.id, true);
+    h += '<div class="post-txt">'+fmtComment(op.comment)+'</div>';
+    h += '<div class="thread-actions">';
+    h += '<a onclick="openThread(\''+esc(t.id)+'\')">['+replies.length+' repl'+(replies.length===1?'y':'ies')+']</a>';
+    h += '<a onclick="openThread(\''+esc(t.id)+'\')">[Reply]</a>';
+    h += '</div>';
+    h += '</div></div>';
+    if(omitted>0){
+      h += '<div class="omitted">'+omitted+' post'+(omitted===1?'':'s')+' omitted. <a onclick="openThread(\''+esc(t.id)+'\')">Click to view.</a></div>';
+    }
+    if(shown.length){
+      h += '<div class="inline-replies">';
+      shown.forEach(p=>{
+        h += '<div class="reply-post"><div class="op-post" style="gap:8px;">';
+        h += postImgHTML(p);
+        h += '<div class="op-body">';
+        h += postHdr(p, t.id, false);
+        h += '<div class="post-txt">'+fmtComment(p.comment)+'</div>';
+        h += '</div></div></div>';
+      });
+      h += '</div>';
+    }
+    h += '</div>';
+  });
+  el.innerHTML = h;
+}
+
+// ── RENDER THREAD VIEW ──
+function renderThread(){
+  const el = document.getElementById('thread-posts');
+  const t = threads.find(t=>t.id===curThreadId);
+  if(!t){ el.innerHTML='<div class="err-msg">Thread not found.</div>'; return; }
+  let h='';
+  t.posts.forEach((p,i)=>{
+    const isOP = i===0;
+    if(isOP){
+      h += '<div class="op-post" id="p'+esc(p.id)+'">';
+      h += postImgHTML(p);
+      h += '<div class="op-body">';
+      h += postHdr(p, t.id, true);
+      h += '<div class="post-txt">'+fmtComment(p.comment)+'</div>';
+      h += '</div></div>';
+    } else {
+      h += '<div class="reply-post" id="p'+esc(p.id)+'">';
+      h += '<div class="op-post" style="gap:8px;">';
+      h += postImgHTML(p);
+      h += '<div class="op-body">';
+      h += postHdr(p, t.id, false);
+      h += '<div class="post-txt">'+fmtComment(p.comment)+'</div>';
+      h += '</div></div></div>';
+    }
+  });
+  el.innerHTML = h;
+}
+</script>
+</body>
+</html>
