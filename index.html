@@ -130,6 +130,24 @@ hr { border:none; border-top:1px solid #d6d6d6; margin:8px 0; }
 #hl, #hr2 { font-size:11px; min-width:120px; }
 #hl a, #hr2 a { color:#800000; font-size:11px; }
 #hl a:hover, #hr2 a:hover { color:#dd0000; }
+
+/* THREAD FOOTER */
+#footer-thread { font-size:11px; color:#555; }
+#thread-bottom-bar { display:flex; align-items:center; justify-content:space-between; border-top:1px solid #b7c5d9; border-bottom:1px solid #b7c5d9; padding:5px 10px; margin-bottom:4px; font-size:12px; background:#fffaf5; max-width:780px; margin:0 auto 4px; }
+#tbb-left a, #tbb-center a { color:#800000; margin-right:6px; font-size:12px; }
+#tbb-left a:hover, #tbb-center a:hover { text-decoration:underline; }
+#tbb-right { font-size:11px; color:#555; }
+#thread-delete-bar { text-align:right; font-size:11px; padding:3px 10px; max-width:780px; margin:0 auto; color:#555; }
+#thread-board-links { text-align:center; font-size:11px; padding:6px 10px; max-width:780px; margin:0 auto; line-height:1.8; color:#555; }
+#thread-board-links a { color:#800000; font-size:11px; }
+#thread-board-links a:hover { text-decoration:underline; }
+#thread-footer-copy { text-align:center; font-size:11px; color:#555; padding:4px 10px; max-width:780px; margin:0 auto; }
+#thread-footer-links { text-align:center; font-size:11px; padding:2px; }
+#thread-footer-links a { color:#34345c; font-size:11px; }
+#thread-footer-links a:hover { text-decoration:underline; }
+
+.post-thumb { max-width:150px; max-height:150px; object-fit:cover; border:1px solid #aaa; display:block; cursor:pointer; margin-top:2px; }
+.post-thumb:hover { opacity:0.8; }
 </style>
 </head>
 <body>
@@ -220,6 +238,15 @@ hr { border:none; border-top:1px solid #d6d6d6; margin:8px 0; }
     </div>
 
   </div>
+  <!-- STATS BOX -->
+  <div id="stats-box">
+    <div id="stats-title">Stats</div>
+    <div id="stats-row">
+      <span><b>Total Posts:</b> <span id="stat-posts">—</span></span>
+      <span><b>Current Users:</b> <span id="stat-users">—</span></span>
+      <span><b>Active Content:</b> <span id="stat-content">—</span></span>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -285,27 +312,40 @@ hr { border:none; border-top:1px solid #d6d6d6; margin:8px 0; }
 
 <!-- FOOTER -->
 <div id="footer">
-  <!-- STATS BOX -->
-  <div id="stats-box">
-    <div id="stats-title">Stats</div>
-    <div id="stats-row">
-      <span><b>Total Posts:</b> <span id="stat-posts">—</span></span>
-      <span><b>Current Users:</b> <span id="stat-users">—</span></span>
-      <span><b>Active Content:</b> <span id="stat-content">—</span></span>
+  <!-- HOME/BOARD FOOTER -->
+  <div id="footer-home-board">
+    <div id="footer-nav-wrap">
+      <div id="footer-nav">
+        <a href="#">Boards</a><a href="#">News</a><a href="#">Blog</a><a href="#">FAQ</a><a href="#">Rules</a><a href="#">Contact</a><a href="#">Advertise</a><a href="#">Press</a>
+      </div>
     </div>
-  </div>
-  <!-- NAV BOXES attached to red line -->
-  <div id="footer-nav-wrap">
-    <div id="footer-nav">
-      <a href="#">Boards</a><a href="#">News</a><a href="#">Blog</a><a href="#">FAQ</a><a href="#">Rules</a><a href="#">Contact</a><a href="#">Advertise</a><a href="#">Press</a>
+    <div id="footer-links">
+      <a href="#">About</a> &bull; <a href="#">Feedback</a> &bull; <a href="#">Legal</a> &bull; <a href="#">Contact</a>
     </div>
+    <div id="footer-copy">Copyright &copy; 2024 Quchan community support. All rights reserved.</div>
   </div>
-  <!-- BLUE LINKS -->
-  <div id="footer-links">
-    <a href="#">About</a> &bull; <a href="#">Feedback</a> &bull; <a href="#">Legal</a> &bull; <a href="#">Contact</a>
+
+  <!-- THREAD FOOTER -->
+  <div id="footer-thread" style="display:none;">
+    <div id="thread-bottom-bar">
+      <div id="tbb-left">
+        <a onclick="goBoardBack()">[Return]</a>
+        <a onclick="goBoardBack()">[Catalog]</a>
+        <a onclick="window.scrollTo(0,0)">[Top]</a>
+      </div>
+      <div id="tbb-center"><a onclick="document.getElementById('reply-form-box').scrollIntoView({behavior:'smooth'})">[Post a Reply]</a></div>
+      <div id="tbb-right"><span id="thread-stats">0 / 0 / 1</span></div>
+    </div>
+    <div id="thread-delete-bar">
+      Delete Post: <input type="checkbox" id="del-fileonly"> <label for="del-fileonly">File Only</label>
+      <input type="button" value="Delete" onclick="deleteChecked()" style="border:1px solid #aaa;background:#f0f0f0;padding:1px 8px;font-size:12px;cursor:pointer;margin-left:4px;">
+    </div>
+    <div id="thread-board-links">
+      <a onclick="goBoard('a','Anime &amp; Manga')">/a/</a> / <a onclick="goBoard('b','Random')">/b/</a> / <a onclick="goBoard('c','Anime/Cute')">/c/</a> / <a onclick="goBoard('v','Video Games')">/v/</a> / <a onclick="goBoard('vg','Video Game Generals')">/vg/</a> / <a onclick="goBoard('mu','Music')">/mu/</a> / <a onclick="goBoard('sp','Sports')">/sp/</a> / <a onclick="goBoard('lit','Literature')">/lit/</a> / <a onclick="goBoard('sci','Science &amp; Math')">/sci/</a> / <a onclick="goBoard('his','History')">/his/</a> / <a onclick="goBoard('fit','Fitness')">/fit/</a> / <a onclick="goBoard('ck','Food &amp; Cooking')">/ck/</a> / <a onclick="goBoard('trv','Travel')">/trv/</a> / <a onclick="goBoard('g','Technology')">/g/</a> / <a onclick="goBoard('co','Comics &amp; Cartoons')">/co/</a> / <a onclick="goBoard('int','International')">/int/</a> / <a onclick="goBoard('x','Paranormal')">/x/</a> / <a onclick="goBoard('pol','Politically Incorrect')">/pol/</a> / <a onclick="goBoard('tv','Television &amp; Film')">/tv/</a> / <a onclick="goBoard('out','Outdoors')">/out/</a> / <a onclick="goBoard('wg','Wallpapers')">/wg/</a> / <a onclick="goBoard('o','Auto')">/o/</a> / <a onclick="goBoard('k','Weapons')">/k/</a> / <a onclick="goBoard('biz','Business &amp; Finance')">/biz/</a> / <a onclick="goBoard('q','Quchan Feedback')">/q/</a> / <a onclick="goBoard('wsr','Worksafe Requests')">/wsr/</a>
+    </div>
+    <div id="thread-footer-copy">All trademarks and copyrights on this page are owned by their respective parties. Images uploaded are the responsibility of the Poster. Comments are owned by the Poster.</div>
+    <div id="thread-footer-links"><a href="#">About</a> &bull; <a href="#">Feedback</a> &bull; <a href="#">Legal</a> &bull; <a href="#">Contact</a></div>
   </div>
-  <!-- COPYRIGHT -->
-  <div id="footer-copy">Copyright &copy; 2024 Quchan community support. All rights reserved.</div>
 </div>
 
 <script>
@@ -347,6 +387,9 @@ function showOnly(id){
   ['page-home','page-board','page-thread'].forEach(p=>{
     document.getElementById(p).classList.toggle('active', p===id);
   });
+  // Show correct footer
+  document.getElementById('footer-home-board').style.display = (id==='page-thread') ? 'none' : '';
+  document.getElementById('footer-thread').style.display = (id==='page-thread') ? '' : 'none';
   window.scrollTo(0,0);
 }
 
@@ -358,8 +401,7 @@ function goHome(){
 
 async function loadStats(){
   try {
-    const res = await fetch(API+'?action=stats');
-    const data = await res.json();
+    const data = await apiGetStats();
     if(data.totalPosts !== undefined){
       document.getElementById('stat-posts').textContent = data.totalPosts.toLocaleString();
       document.getElementById('stat-users').textContent = '—';
@@ -407,9 +449,34 @@ function quotePost(id){
 }
 
 // ── API CALLS ──
-async function apiGet(board){
-  const res = await fetch(API+'?action=get&board='+encodeURIComponent(board));
-  return res.json();
+function apiGet(board){
+  return new Promise((resolve, reject) => {
+    const cb = 'qcb_' + Date.now();
+    const script = document.createElement('script');
+    window[cb] = function(data){ 
+      delete window[cb]; 
+      document.body.removeChild(script); 
+      resolve(data); 
+    };
+    script.onerror = () => reject(new Error('Network error'));
+    script.src = API + '?action=get&board=' + encodeURIComponent(board) + '&callback=' + cb;
+    document.body.appendChild(script);
+  });
+}
+
+function apiGetStats(){
+  return new Promise((resolve, reject) => {
+    const cb = 'qcb_' + Date.now();
+    const script = document.createElement('script');
+    window[cb] = function(data){ 
+      delete window[cb]; 
+      document.body.removeChild(script); 
+      resolve(data); 
+    };
+    script.onerror = () => reject(new Error('Network error'));
+    script.src = API + '?action=stats&callback=' + cb;
+    document.body.appendChild(script);
+  });
 }
 
 async function apiPost(data){
@@ -463,6 +530,24 @@ function openThread(tid){
   loadThread(tid);
 }
 
+// ── UPLOAD IMAGE ──
+async function uploadImageToGDrive(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64 = e.target.result.split(',')[1];
+      const mimeType = file.type;
+      const filename = file.name;
+      try {
+        const res = await apiPost({ action: 'uploadImage', base64, mimeType, filename });
+        if (res.ok) resolve(res);
+        else reject(new Error(res.error || 'Upload failed'));
+      } catch(err) { reject(err); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 // ── SUBMIT NEW THREAD ──
 async function submitNewThread(){
   const comment = document.getElementById('nt-comment').value.trim();
@@ -473,9 +558,18 @@ async function submitNewThread(){
   const image   = (imgEl.files&&imgEl.files[0]) ? imgEl.files[0].name : '';
 
   setBusy('nt-btn',true);
+  setMsg('nt-msg','Uploading...',true);
+  let imageUrl = '';
+  try {
+    if (imgEl.files && imgEl.files[0]) {
+      setMsg('nt-msg','Uploading image...',true);
+      const up = await uploadImageToGDrive(imgEl.files[0]);
+      imageUrl = up.imageUrl || '';
+    }
+  } catch(e) { setMsg('nt-msg','Image upload failed: '+e.message, false); setBusy('nt-btn',false); return; }
   setMsg('nt-msg','Posting...',true);
   try {
-    const res = await apiPost({ action:'newThread', board:curBoard, name, subject, comment, image });
+    const res = await apiPost({ action:'newThread', board:curBoard, name, subject, comment, image, imageUrl });
     if(res.ok){
       document.getElementById('nt-comment').value='';
       document.getElementById('nt-subject').value='';
@@ -501,9 +595,17 @@ async function submitReply(){
   const image = (imgEl.files&&imgEl.files[0]) ? imgEl.files[0].name : '';
 
   setBusy('rp-btn',true);
+  let imageUrl = '';
+  try {
+    if (imgEl.files && imgEl.files[0]) {
+      setMsg('rp-msg','Uploading image...',true);
+      const up = await uploadImageToGDrive(imgEl.files[0]);
+      imageUrl = up.imageUrl || '';
+    }
+  } catch(e) { setMsg('rp-msg','Image upload failed: '+e.message, false); setBusy('rp-btn',false); return; }
   setMsg('rp-msg','Posting...',true);
   try {
-    const res = await apiPost({ action:'reply', board:curBoard, tid:curThreadId, name, comment, image });
+    const res = await apiPost({ action:'reply', board:curBoard, tid:curThreadId, name, comment, image, imageUrl });
     if(res.ok){
       document.getElementById('rp-comment').value='';
       document.getElementById('rp-name').value='';
@@ -550,9 +652,18 @@ function postHdr(p, tid, isOP){
 }
 
 function postImgHTML(p){
-  if(!p.image) return '';
-  return '<div class="op-img"><div class="imgfile">File: '+esc(p.image)+'</div>'
-        +'<div class="thumb-ph">[image]</div></div>';
+  if(!p.image && !p.imageUrl) return '';
+  let inner = '';
+  if(p.imageUrl){
+    inner = '<a href="'+esc(p.imageUrl)+'" target="_blank">'
+           +'<img src="'+esc(p.imageUrl)+'" class="post-thumb" onerror="this.style.display='none'">'
+           +'</a>';
+  } else {
+    inner = '<div class="thumb-ph">[image]</div>';
+  }
+  return '<div class="op-img">'
+        +'<div class="imgfile">File: <a href="'+(p.imageUrl?esc(p.imageUrl):'#')+'" target="_blank">'+esc(p.image||'image')+'</a></div>'
+        +inner+'</div>';
 }
 
 // ── RENDER BOARD INDEX ──
@@ -604,6 +715,10 @@ function renderThread(){
   const el = document.getElementById('thread-posts');
   const t = threads.find(t=>t.id===curThreadId);
   if(!t){ el.innerHTML='<div class="err-msg">Thread not found.</div>'; return; }
+  // Update thread stats: replies / images / pages
+  const replyCount = t.posts.length - 1;
+  const imgCount = t.posts.filter(p=>p.image).length;
+  document.getElementById('thread-stats').textContent = replyCount + ' / ' + imgCount + ' / 1';
   let h='';
   t.posts.forEach((p,i)=>{
     const isOP = i===0;
@@ -626,6 +741,10 @@ function renderThread(){
   });
   el.innerHTML = h;
 }
+function deleteChecked(){
+  alert('Select a post with [X] to delete it.');
+}
+
 // Load stats on startup
 loadStats();
 </script>
