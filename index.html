@@ -635,15 +635,15 @@ function postImgHTML(p){
   if(!p.image && !p.imageUrl) return '';
   let inner = '';
   if(p.imageUrl){
-    inner = '<a href="'+esc(p.imageUrl)+'" target="_blank">'
-           +'<img src="'+esc(p.imageUrl)+'" class="post-thumb" onerror="this.style.display='none'">'
-           +'</a>';
+    const imgTag = '<img src="' + esc(p.imageUrl) + '" class="post-thumb">';
+    inner = '<a href="' + esc(p.imageUrl) + '" target="_blank">' + imgTag + '</a>';
   } else {
     inner = '<div class="thumb-ph">[image]</div>';
   }
-  return '<div class="op-img">'
-        +'<div class="imgfile">File: <a href="'+(p.imageUrl?esc(p.imageUrl):'#')+'" target="_blank">'+esc(p.image||'image')+'</a></div>'
-        +inner+'</div>';
+  const fileLink = p.imageUrl
+    ? '<a href="' + esc(p.imageUrl) + '" target="_blank">' + esc(p.image||'image') + '</a>'
+    : esc(p.image||'image');
+  return '<div class="op-img"><div class="imgfile">File: ' + fileLink + '</div>' + inner + '</div>';
 }
 
 // ── RENDER BOARD INDEX ──
