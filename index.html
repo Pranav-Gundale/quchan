@@ -449,34 +449,14 @@ function quotePost(id){
 }
 
 // ── API CALLS ──
-function apiGet(board){
-  return new Promise((resolve, reject) => {
-    const cb = 'qcb_' + Date.now();
-    const script = document.createElement('script');
-    window[cb] = function(data){ 
-      delete window[cb]; 
-      document.body.removeChild(script); 
-      resolve(data); 
-    };
-    script.onerror = () => reject(new Error('Network error'));
-    script.src = API + '?action=get&board=' + encodeURIComponent(board) + '&callback=' + cb;
-    document.body.appendChild(script);
-  });
+async function apiGet(board){
+  const res = await fetch(API + '?action=get&board=' + encodeURIComponent(board));
+  return res.json();
 }
 
-function apiGetStats(){
-  return new Promise((resolve, reject) => {
-    const cb = 'qcb_' + Date.now();
-    const script = document.createElement('script');
-    window[cb] = function(data){ 
-      delete window[cb]; 
-      document.body.removeChild(script); 
-      resolve(data); 
-    };
-    script.onerror = () => reject(new Error('Network error'));
-    script.src = API + '?action=stats&callback=' + cb;
-    document.body.appendChild(script);
-  });
+async function apiGetStats(){
+  const res = await fetch(API + '?action=stats');
+  return res.json();
 }
 
 async function apiPost(data){
